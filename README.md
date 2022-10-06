@@ -13,15 +13,14 @@
 * src: source code
 * results: predicted CVSS in graph dataset format
 
-### Description of *src*
+## Description of *src*
 1) makeDAG.py: Data collection (in above figure)
 2) makeFeatureVec.py: Make Dataset in Modeling (in above figure)
 3) makeDataset.py: Make Training Dataset 
 4) trainingModel.py: Training and Test based on GNN and MLP
 5) pathGenerator.py: Find Attack Path
 
-## Requirement
-### Name                 Version  
+## Requirement (Name                 Version)
 dgl-cuda11.3              0.8.1  
 torch                        1.9.1  
   
