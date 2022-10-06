@@ -52,9 +52,11 @@ def run_algorithm(node_data_path, edge_data_path, start_vertex, end_vertex) -> N
 
 if __name__ == '__main__':
     seed = 7
+    num_of_nodes = 3842
     start_vertex = 1337
     end_vertex = 0
-    assert os.path.exists("../graph_dataset")
-    NODE_DATA_PATH = f'../graph_dataset/DAG_nodes_features_{seed}.csv'
-    EDGE_DATA_PATH = f'../graph_dataset/Res_score_{seed}.csv'
+    assert os.path.exists("../graph_data")
+    assert os.path.exists("../results")
+    NODE_DATA_PATH = f'../graph_data/DAG_nodes_features_{seed}_{num_of_nodes}.csv'
+    EDGE_DATA_PATH = f'../results/Res_score_{seed}.csv'
     run_algorithm(NODE_DATA_PATH, EDGE_DATA_PATH, start_vertex, end_vertex)
