@@ -11,7 +11,7 @@
 * image: image output of program
 * model: model of GNN and MLP used predicting CVSS saved
 * src: source code
-* results: predicted CVSS in graph dataset format
+* results: predicted CVSS in graph dataset format and r2 score
 
 ## Description of *src*
 1) makeDAG.py: Data collection (in above figure)
