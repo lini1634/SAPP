@@ -112,8 +112,6 @@ def compute_loss(pos_score, neg_score, train_vul_g, train_nor_g):
 def compute_auc(pos_score, neg_score, test_vul_g, test_nor_g):
     scores = torch.cat([pos_score, neg_score]).numpy()
     labels = torch.cat([test_vul_g.edata['weight'], test_nor_g.edata['weight']]).numpy()
-    print(np.unique(labels))
-    print(f"scores: {scores}, labels: {labels}")
     return r2_score(labels, scores), scores
     
 def print_plot(features_col, feat_mask):
@@ -126,7 +124,7 @@ def print_plot(features_col, feat_mask):
     os.makedirs("../image", exist_ok=True)
     plt.savefig(f"../image/{name}.png", bbox_inches='tight')
 
-def training(train_g, train_nor_g, train_vul_g):
+def training(train_g, train_nor_g, train_vul_g, test_vul_g, test_nor_g):
     train_g.ndata['feat'] = torch.nan_to_num(train_g.ndata['feat'])
     a = train_g.ndata['feat']
     for x in np.isnan(a.numpy()):
@@ -137,44 +135,45 @@ def training(train_g, train_nor_g, train_vul_g):
     model = GraphSAGE(train_g.ndata['feat'].shape[1], 32)
     pred = MLPPredictor(32)
     optimizer = torch.optim.Adam(itertools.chain(model.parameters(), pred.parameters()), lr=0.01)
-
-    print("[INFO] Training Start!")
-    start = time.time()
-    for e in range(100):
+    if os.path.exists("../model/cvss_prediction_graphsage.pt") and os.path.exists("../model/cvss_prediction_mlp.pt"):
+        model.load_state_dict(torch.load("../model/cvss_prediction_graphsage.pt"))
         h = model(train_g, train_g.ndata['feat'].float())
-        pos_score = pred(train_vul_g, h)
-        neg_score = pred(train_nor_g, h)
-        loss = compute_loss(pos_score, neg_score, train_vul_g, train_nor_g)
+        pred.load_state_dict(torch.load("../model/cvss_prediction_mlp.pt"), strict=False)
 
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        
-        print('In epoch {}, loss: {}'.format(e, loss))
+    else:
+        print("[INFO] Training Start!")
+        start = time.time()
+        for e in range(100):
+            h = model(train_g, train_g.ndata['feat'].float())
+            pos_score = pred(train_vul_g, h)
+            neg_score = pred(train_nor_g, h)
+            loss = compute_loss(pos_score, neg_score, train_vul_g, train_nor_g)
 
-    print(f'time: {time.time()-start}')
-    print("[INFO] Training Done..")
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            
+            print('In epoch {}, loss: {}'.format(e, loss))
 
-    os.makedirs("../model", exist_ok=True)
-    torch.save(model.state_dict(), "../model/cvss_prediction_graphsage.pt")
-    torch.save(model.state_dict(), "../model/cvss_prediction_mlp.pt")
+        print(f'time: {time.time()-start}')
+        print("[INFO] Training Done..")
 
-def test(seed, train_g, test_vul_g, test_nor_g):
-    print("[INFO] Test Start!")
-    model = GraphSAGE(train_g.ndata['feat'].shape[1], 32)
-    h = model(train_g, train_g.ndata['feat'].float())
-    pred = MLPPredictor(32)
-    model.load_state_dict(torch.load("../model/cvss_prediction_graphsage.pt"))
-    pred.load_state_dict(torch.load("../model/cvss_prediction_mlp.pt"), strict=False)
+        os.makedirs("../model", exist_ok=True)
+        torch.save(model.state_dict(), "../model/cvss_prediction_graphsage.pt")
+        torch.save(pred.state_dict(), "../model/cvss_prediction_mlp.pt")
+
     with torch.no_grad():
         pos_score = pred(test_vul_g, h)
         neg_score = pred(test_nor_g, h)
         start = time.time()
-        print("----------------Result------------------")
         r2score, Pred_Score = compute_auc(pos_score, neg_score, test_vul_g, test_nor_g)
-        print('r2_score', r2score) 
-        print(f'time: {time.time()-start}')
-        print("----------------------------------------")
+
+    os.makedirs("../results", exist_ok=True)
+    with open("../results/results.txt", "w") as file:
+        file.write("----------------Result------------------\n")
+        file.write(f'r2_score: {r2score}\n') 
+        file.write(f'time(sec): {time.time()-start}\n')
+        file.write("----------------------------------------")
 
     features = test_g.ndata['feat'].float()
     features = torch.nan_to_num(features)
@@ -195,7 +194,6 @@ def test(seed, train_g, test_vul_g, test_nor_g):
     test_src_edges = test_vul_g.edges()[0].tolist() + test_nor_g.edges()[0].tolist()
     test_des_edges = test_vul_g.edges()[1].tolist() + test_nor_g.edges()[1].tolist()
 
-    os.makedirs("../results", exist_ok=True)
     Res_score = pd.DataFrame({"Src":test_src_edges,
               "Dst": test_des_edges,
               "Weight": Pred_Score})
@@ -205,6 +203,4 @@ if __name__ == "__main__":
     seed = 7
     num_of_nodes = 3842
     train_g, train_nor_g, train_vul_g, test_g, test_nor_g, test_vul_g = make_graph_dataset(seed, num_of_nodes)
-    if not (os.path.exists("../model/cvss_prediction_graphsage.pt") and os.path.exists("../model/cvss_prediction_mlp.pt")):
-        training(train_g, train_nor_g, train_vul_g)
-    test(seed, train_g, test_vul_g, test_nor_g)
+    training(train_g, train_nor_g, train_vul_g, test_vul_g, test_nor_g)
