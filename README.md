@@ -34,4 +34,4 @@ TBD
 
 ## About
 This program is authored and maintained by **Haerin Kim**, and **Jeong Do Yoo**.  
-> Email: rlagoflszz@gmail.com, opteryx25104@hksecurity.net
+> Email: rlagoflszz@gmail.com, opteryx25104@korea.ac.kr
