@@ -1,15 +1,5 @@
-from collections import deque
-
-
 def astar(graph, start_vertex, end_vertex):
-    H = {
-        0: 0.1,
-        1: 0.1,
-        2: 0.1,
-        3: 0.1,
-        4: 0.1,
-        5: 0.1
-    }
+    H = {x: 0.1 for x in range(graph.v)}
 
     open_list = set([start_vertex])
     closed_list = set([])
@@ -27,7 +17,7 @@ def astar(graph, start_vertex, end_vertex):
 
         # find a node with the lowest value of f() - evaluation function
         for v in open_list:
-            if n == None or g[v] + H[v] > g[n] + H[n]:
+            if n is None or g[v] + H[v] > g[n] + H[n]:
                 n = v
 
         if n is None:
