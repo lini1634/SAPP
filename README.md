@@ -59,13 +59,15 @@ Output files:
 python trainingModel.py
 ```
 ### 4-2) Results
-Ouput files: results/results.txt
+Ouput files: 
+* results/results.txt
 ```
 ----------------Result------------------
 r2_score: 0.9102470316643958
 time: 0.0319979190826416
 ----------------------------------------
 ```
+* results/Res_score_{seed}.csv
 
 ### 5-1) Run
 ```python3
