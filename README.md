@@ -30,50 +30,52 @@ torch                        1.9.1
 python makeDAG.py
 ```
 ### 1-2) Results
-```
-cmd에서 코드 실행 결과..
-```
-### 1-3) Ouput files
+Output files: 
+* graph_data/DAG_nodes_{seed}\_{num_of_nodes}.csv
+* graph_data/DAG_edges_{seed}\_{num_of_nodes}.csv
 
 ### 2-1) Run
 ```python3
 python makeFeatureVec.py
 ```
 ### 2-2) Results
-```
-cmd에서 코드 실행 결과..
-```
-### 2-3) Ouput files
+Output files: graph_data/DAG_nodes_features_{seed}\_{num_of_nodes}.csv
 
 ### 3-1) Run
 ```python3
 python makeDataset.py
 ```
 ### 3-2) Results
-```
-cmd에서 코드 실행 결과..
-```
-### 3-3) Ouput files
+Output files:
+* graph_dataset/DAG_train_edges.csv
+* graph_dataset/DAG_train_normal_edges.csv
+* graph_dataset/DAG_train_vulns_edges.csv
+* graph_dataset/DAG_test_edges.csv
+* graph_dataset/DAG_test_normal_edges.csv
+* graph_dataset/DAG_test_vulns_edges.csv
 
 ### 4-1) Run
 ```python3
 python trainingModel.py
 ```
 ### 4-2) Results
+Ouput files: results/results.txt
 ```
-cmd에서 코드 실행 결과..
+----------------Result------------------
+r2_score: 0.9102470316643958
+time: 0.0319979190826416
+----------------------------------------
 ```
-### 4-3) Ouput files
 
 ### 5-1) Run
 ```python3
 python pathGenerator.py
 ```
 ### 5-2) Results
+Ouput files: results/results.txt
+```  
+cmd에서 코드 실행 결과, output files..
 ```
-cmd에서 코드 실행 결과..
-```
-### 5-3) Ouput files
 
 ## Publications
 ```
